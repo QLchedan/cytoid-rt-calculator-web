@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Cytoid RT计算器</title>
+        <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script>
+            var mode = 1; //1:acc2rt  -1:rt2acc
+            function change_mode(){
+                mode = -mode;
+                if(mode == 1){
+                    document.getElementById("mode_display").innerHTML = "&nbsp;&nbsp;acc转rt";
+                    document.getElementById("acc_rt").innerHTML = "输入acc:&nbsp;&nbsp;&nbsp;&nbsp";
+                }
+                else{
+                    document.getElementById("mode_display").innerHTML = "&nbsp;&nbsp;rt转acc";
+                    document.getElementById("acc_rt").innerHTML = "输入rt:&nbsp;&nbsp;&nbsp;&nbsp";
+                }
+            }
+            function calc(){
+                var acc_rt = parseFloat(document.getElementById("acc_rt_input").value);
+                var lv = parseFloat(document.getElementById("lv_input").value);
+                if(mode == 1){
+                    var rt = 0;
+                    if (acc_rt > 0 && acc_rt < 70){
+                        rt = Math.sqrt(acc_rt / 70) * 0.5 * lv;
+                    }
+                    else if (acc_rt >= 70 && acc_rt < 97){
+                        rt = (0.7 - 0.2 * Math.log10((100 - acc_rt) / 3)) * lv;
+                    }
+                    else if (acc_rt >= 97 && acc_rt < 99.7){
+                        rt = (0.7 - 0.16 * Math.log10((100 - acc_rt) / 3)) * lv;
+                    }
+                    else if (acc_rt >= 99.7 && acc_rt < 99.97){
+                        rt = (0.78 - 0.08 * Math.log10((100 - acc_rt) / 3)) * lv;
+                    }
+                    else if (acc_rt >= 99.97 && acc_rt <= 100){
+                        rt = (2 * acc_rt - 199) * lv;
+                    }   
+                    else{
+                        rt = "Err:你见过这样的acc吗(半恼)"
+                    }
+                    document.getElementById("output").innerHTML = rt.toString();
+                }
+                else{
+                    $.post("http://rt_calc.qlchedan.ml:8080/rt2acc", {rt: acc_rt, lv: lv}, function(data_, status){
+                        document.getElementById("output").innerHTML = data_.toString();
+                    });
+                }
+            }
+        </script>
+    </head>
+    <body>
+        <button id="change_mode" onclick="change_mode();">切换模式</button><span>当前模式:</span><span id="mode_display">&nbsp;&nbsp;acc转rt</span>
+        </br>
+        <span id="acc_rt">输入acc:&nbsp;&nbsp;&nbsp;&nbsp</span><input type="text" id="acc_rt_input">
+        </br>
+        <span id="lv">输入谱面标级:&nbsp;&nbsp;&nbsp;&nbsp</span><input type="text" id="lv_input">
+        </br>
+        <span>输出结果:&nbsp;&nbsp;</span><span id="output"></span>
+        </br>
+        </br>
+        <button id="change_mode" onclick="calc();">计算!11!!11</button>
+        </br>
+        <span>v0.0.1 by千里扯淡</span>
+    </body>
+</html>
