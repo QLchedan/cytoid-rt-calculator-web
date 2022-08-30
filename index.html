@@ -3,17 +3,19 @@
     <head>
         <title>Cytoid RT计算器</title>
         <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>
+        <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.0/js/bootstrap.min.js"></script>
+        <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.2.0/css/bootstrap.min.css" rel="stylesheet">
         <script>
             var mode = 1; //1:acc2rt  -1:rt2acc
             function change_mode(){
                 mode = -mode;
                 if(mode == 1){
                     document.getElementById("mode_display").innerHTML = "&nbsp;&nbsp;acc转rt";
-                    document.getElementById("acc_rt").innerHTML = "输入acc:&nbsp;&nbsp;&nbsp;&nbsp";
+                    document.getElementById("acc_rt").innerHTML = "输入acc:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 }
                 else{
                     document.getElementById("mode_display").innerHTML = "&nbsp;&nbsp;rt转acc";
-                    document.getElementById("acc_rt").innerHTML = "输入rt:&nbsp;&nbsp;&nbsp;&nbsp";
+                    document.getElementById("acc_rt").innerHTML = "输入rt:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
                 }
             }
             function calc(){
@@ -42,25 +44,53 @@
                     document.getElementById("output").innerHTML = rt.toString();
                 }
                 else{
-                    $.post("http://rt_calc.qlchedan.ml:8080/rt2acc", {rt: acc_rt, lv: lv}, function(data_, status){
-                        document.getElementById("output").innerHTML = data_.toString();
-                    });
+                    var acc = 0;
+                    if(lv < acc_rt){
+                        acc = "无解";
+                    }
+                    else{
+                        acc = 280 * Math.pow(acc_rt, 2) / Math.pow(lv, 2);
+                        if(acc >= 70){
+                            acc = 100 - 3 * Math.pow(10, 3.5- (5 * acc_rt / lv));
+                            if(acc >= 97){
+                                acc = 100 - 3 * Math.pow(10, (35 - 50 * acc_rt / lv) / 8);
+                                if(acc >= 99.7){
+                                    acc = 100 - 3 * Math.pow(10, (39 - 50 * acc_rt / lv) / 4);
+                                    if(acc >= 99.97){
+                                        acc = (acc_rt / lv + 199) / 2;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    document.getElementById("output").innerHTML = acc.toString()
                 }
+            }
+            function github(){
+                window.location.href='https://github.com/QLchedan/cytoid-rt-calculator-web';
             }
         </script>
     </head>
-    <body>
-        <button id="change_mode" onclick="change_mode();">切换模式</button><span>当前模式:</span><span id="mode_display">&nbsp;&nbsp;acc转rt</span>
+    <body style="background-color:#f1f1f1;">
+        <button id="change_mode" onclick="change_mode();" class="btn btn-dark">切换模式</button><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当前模式:</span><span id="mode_display">&nbsp;&nbsp;acc转rt</span>
         </br>
-        <span id="acc_rt">输入acc:&nbsp;&nbsp;&nbsp;&nbsp</span><input type="text" id="acc_rt_input">
+        <span id="acc_rt">输入acc:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><input type="text" id="acc_rt_input">
         </br>
         <span id="lv">输入谱面标级:&nbsp;&nbsp;&nbsp;&nbsp</span><input type="text" id="lv_input">
         </br>
         <span>输出结果:&nbsp;&nbsp;</span><span id="output"></span>
         </br>
         </br>
-        <button id="change_mode" onclick="calc();">计算!11!!11</button>
+        <button id="change_mode" onclick="calc();" class="btn btn-dark">计算!11!!11</button>
         </br>
-        <span>v0.0.1 by千里扯淡</span>
+        </br>
+        </br>
+        </br>
+        </br>
+        <span>&nbsp;&nbsp;Cytoid RT 计算器 v0.0.2</span>
+        </br>
+        <span>&nbsp;&nbsp;by千里扯淡</span>
+        </br>
+        <button type="button" class="btn btn-link" onclick="github()">Github 链接</button>
     </body>
 </html>
